@@ -9,8 +9,8 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
-    def update(self):
-        self.rect.x -= 4
+    def update(self, score):
+        self.rect.x -= 4 + score // 10
         self.mask = pygame.mask.from_surface(self.image)
 
 

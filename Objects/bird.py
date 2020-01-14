@@ -8,11 +8,11 @@ class Bird(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (85, 60))
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
+        self.x = x
+        self.y = y
 
-    def update(self):
-        delta_position_y = 3
-        if pygame.key.get_pressed()[pygame.K_SPACE]:
-            delta_position_y = -4
-        if 30 < self.rect.y < 630:
-            self.rect.center = (self.rect.x, self.rect.y + delta_position_y)
+    def update(self, score):
+        self.y += 3 + score // 20 * 0.4
+        if 30 < self.y < 630:
+            self.rect.center = (self.x, self.y)
         self.mask = pygame.mask.from_surface(self.image)
