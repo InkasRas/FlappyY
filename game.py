@@ -2,7 +2,7 @@ import pygame
 import sys
 from random import randint
 from Objects.bird import Bird
-from Objects.blocks import TopBlock, BottomBlock
+from Objects.blocks import TopBlock, BottomBlock, Circle
 
 
 class MainGame:
@@ -13,7 +13,8 @@ class MainGame:
         self.clock = clock
         self.score = 0
         self.DRAW_CIRCLES = 30
-        self.draw_circles_timer = pygame.time.set_timer(self.DRAW_CIRCLES, 900)
+        self.draw_circles_timer = pygame.time.set_timer(self.DRAW_CIRCLES, 2300)
+        self.circles = list()
 
     def terminate(self):
         pygame.quit()
@@ -39,10 +40,9 @@ class MainGame:
                     if 30 < self.bird_obj.rect.y < 630:
                         self.bird_obj.y -= 30
             if event.type == self.DRAW_CIRCLES:
+                self.circles.clear()
                 for i in range(randint(10, 30)):
-                    pygame.draw.circle(self.screen,
-                                       (randint(0, 255), randint(0, 255), randint(0, 255)),
-                                       (randint(10, 890), randint(10, 640)), randint(10, 60))
+                    self.circles.append(Circle(self.screen))
 
     def start_game(self):
         self.score = 0
@@ -62,6 +62,8 @@ class MainGame:
 
     def update_all(self):
         self.all_sprites.update(self.score)
+        for circle in self.circles:
+            circle.update(self.score)
         if pygame.sprite.spritecollide(self.bird_obj, self.top_blocks_sprites, False,
                                        pygame.sprite.collide_mask) or pygame.sprite.spritecollide(
             self.bird_obj, self.bottom_blocks_sprites, False,

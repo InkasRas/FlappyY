@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 
 
 class Block(pygame.sprite.Sprite):
@@ -22,3 +23,19 @@ class TopBlock(Block):
 class BottomBlock(Block):
     def __init__(self, x, y, h):
         super().__init__('Extra files/bp.png', x, y, h)
+
+
+class Circle:
+    def __init__(self, screen):
+        self.color = (randint(0, 255), randint(0, 255), randint(0, 255))
+        self.screen = screen
+        self.x = randint(10, 950)
+        self.y = randint(10, 640)
+        self.size = randint(50, 90)
+
+    def update(self, score):
+        self.x -= 4 + score // 10
+        self.size -= 1
+        if self.size < 0:
+            self.size = 0
+        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.size)
