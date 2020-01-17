@@ -134,6 +134,11 @@ class MainGame:  # Логика игры
 
     def pause(self):  # Функиця, запускающая паузу
         pause_status = True
+        pause_image = pygame.image.load('Extra Files/Images/pause.png')
+        pause_image = pygame.transform.scale(pause_image, (80, 60))
+        pause_rect = pause_image.get_rect()
+        pause_rect.x, pause_rect.y = self.screen_size[0] / 2 - 180, self.screen_size[1] / 4 + 20
+
         pygame.mixer.music.pause()
         while pause_status:
             mouse = pygame.mouse.get_pos()
@@ -152,6 +157,7 @@ class MainGame:  # Логика игры
                         pause_status = False
                     if event.key == pygame.K_BACKSPACE:
                         self.terminate()
+            self.screen.blit(pause_image, pause_rect)
             self.show_message('Пауза', self.screen_size[0] / 2 - 90, self.screen_size[1] / 4 + 25,
                               (10, 10, 255), 80)
             self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
