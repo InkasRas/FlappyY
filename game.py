@@ -50,6 +50,8 @@ class MainGame:  # Логика игры
                 if event.key == pygame.K_SPACE:
                     if 30 < self.bird_obj.rect.y < 630:
                         self.bird_obj.y -= 30
+                    self.bird_obj.count += 3
+                    self.bird_obj.change_image()
             if event.type == self.DRAW_CIRCLES:
                 self.circles.clear()
                 for i in range(randint(10, 30)):
