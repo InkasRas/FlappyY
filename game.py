@@ -162,9 +162,12 @@ class MainGame:  # Логика игры
             self.screen.blit(pause_image, pause_rect)
             self.show_message('Пауза', self.screen_size[0] / 2 - 90, self.screen_size[1] / 4 + 25,
                               (10, 10, 255), 80)
-            self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
-                              self.screen_size[1] / 2 + 15, (0, 0, 0), 45)
-
+            if self.score // 50 % 2 != 1:
+                self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
+                                  self.screen_size[1] / 2 + 15, (0, 0, 0), 45)
+            else:
+                self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
+                                  self.screen_size[1] / 2 + 15, (255, 255, 255), 45)
             if 250 > mouse[0] > 50 and 576 > mouse[1] > 500:
                 pygame.draw.rect(self.screen, (127, 0, 255), (50, 500, 200, 76))
                 self.show_message('Продолжить', 75, 530, (30, 30, 30), 26)
@@ -231,8 +234,12 @@ class MainGame:  # Логика игры
                               self.screen_size[1] / 2 - 100,
                               (201, 0, 0),
                               70)
-            self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
-                              self.screen_size[1] / 2 + 15, (0, 0, 0), 45)
+            if self.score // 50 % 2 != 1:
+                self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
+                                  self.screen_size[1] / 2 + 15, (0, 0, 0), 45)
+            else:
+                self.show_message('Счет: ' + str(self.score), self.screen_size[0] / 2 - 65,
+                                  self.screen_size[1] / 2 + 15, (255, 255, 255), 45)
             self.show_message('Рекорд: ' + str(record),
                               self.screen_size[0] / 2 - 65, self.screen_size[1] / 2 + 55,
                               (0, 100, 160), 45)
@@ -257,10 +264,12 @@ class MainGame:  # Логика игры
         while True:
             if self.score // 50 % 2 == 1 and self.score != 0:
                 self.screen.fill((0, 0, 0))
+                self.show_message('Счет: ' + str(self.score), 30, 30, (255, 255, 255), 30)
+
             else:
                 self.screen.fill((255, 255, 255))
+                self.show_message('Счет: ' + str(self.score), 30, 30, (0, 0, 0), 30)
             self.get_events()
             self.update_all()
-            self.show_message('Счет: ' + str(self.score), 30, 30, (0, 0, 0), 30)
             self.all_sprites.draw(self.screen)
             pygame.display.flip()
