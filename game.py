@@ -1,8 +1,8 @@
 import pygame
 import sys
-from random import randint
+from random import randint, choice
 from Objects.bird import Bird
-from Objects.blocks import TopBlock, BottomBlock, Circle
+from Objects.blocks import TopBlock, BottomBlock, Circle, ExtraSpeed, Ghost, FixWidth
 
 
 class MainGame:
@@ -11,9 +11,13 @@ class MainGame:
         self.screen = screen
         self.screen_size = screen_size
         self.clock = clock
+        self.ability_accept = False
         self.score = 0
+        self.speed = None
+        self.ON = 31
+        self.ability = None
+        self.ghost = False
         self.DRAW_CIRCLES = 30
-        self.draw_circles_timer = pygame.time.set_timer(self.DRAW_CIRCLES, 2300)
         self.circles = list()
 
     def terminate(self):
@@ -35,6 +39,13 @@ class MainGame:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.pause()
+                    pygame.display.flip()
+                    if self.score // 50 % 2 == 1 and self.score != 0:
+                        self.screen.fill((0, 0, 0))
+                    else:
+                        self.screen.fill((255, 255, 255))
+                    self.update_all()
+                    pygame.time.wait(1500)
                     print('STOP+')
                 if event.key == pygame.K_SPACE:
                     if 30 < self.bird_obj.rect.y < 630:
@@ -43,8 +54,18 @@ class MainGame:
                 self.circles.clear()
                 for i in range(randint(10, 30)):
                     self.circles.append(Circle(self.screen))
+            if event.type == self.ON:
+                self.ability_accept = False
+                self.ability = None
+                self.speed = None
+                self.ghost = False
 
     def start_game(self):
+        pygame.time.set_timer(self.DRAW_CIRCLES, 2300)
+        self.ability = None
+        self.speed = None
+        self.ghost = False
+        self.ability_accept = False
         self.score = 0
         self.all_sprites = pygame.sprite.Group()
         self.bottom_blocks_sprites = pygame.sprite.Group()
@@ -61,17 +82,32 @@ class MainGame:
         self.top_blocks_sprites.add(self.bb)
 
     def update_all(self):
-        self.all_sprites.update(self.score)
+
+        self.all_sprites.update(self.score, self.speed)
         for circle in self.circles:
             circle.update(self.score)
-        if pygame.sprite.spritecollide(self.bird_obj, self.top_blocks_sprites, False,
-                                       pygame.sprite.collide_mask) or pygame.sprite.spritecollide(
+        if (pygame.sprite.spritecollide(self.bird_obj, self.top_blocks_sprites, False,
+                                        pygame.sprite.collide_mask) or pygame.sprite.spritecollide(
             self.bird_obj, self.bottom_blocks_sprites, False,
-            pygame.sprite.collide_mask):
+            pygame.sprite.collide_mask)) and not self.ghost:
             self.game_over()
+        if self.ability is not None:
+            if pygame.sprite.spritecollide(self.bird_obj, self.abilities, False,
+                                           pygame.sprite.collide_mask):
+                self.all_sprites.remove(self.ability)
+                self.ability_accept = True
+                if type(self.ability) == ExtraSpeed:
+                    self.speed = 6
+                elif type(self.ability) == Ghost:
+                    self.ghost = True
+                self.ON = 31
+                pygame.time.set_timer(self.ON, 10000)
 
         if self.bb.rect.x < self.screen_size[0] / 2 and self.tb.rect.x < self.screen_size[1] / 2:
             self.create_new_blocks()
+            if self.ability is not None and self.ability_accept:
+                if type(self.ability) == ExtraSpeed:
+                    self.score += 3
             self.score += 1
 
     def create_new_blocks(self):
@@ -80,8 +116,16 @@ class MainGame:
         self.top_blocks_sprites = pygame.sprite.Group()
         self.top_blocks_sprites.add(self.tb)
         self.all_sprites.add(self.tb)
-        random_width = randint(100, 150)
-        self.bb = BottomBlock(940, h + random_width, self.screen_size[1] - h - random_width)
+        width = randint(100, 150)
+        if self.ability is not None and self.ability_accept:
+            if type(self.ability) == FixWidth:
+                width = 180
+        if randint(0, 100) >= 1 and not self.ability_accept:
+            self.ability = choice([Ghost, ExtraSpeed, FixWidth])(940, h + width / 2 - 20)
+            self.abilities = pygame.sprite.Group()
+            self.abilities.add(self.ability)
+            self.all_sprites.add(self.ability)
+        self.bb = BottomBlock(940, h + width, self.screen_size[1] - h - width)
         self.bottom_blocks_sprites = pygame.sprite.Group()
         self.bottom_blocks_sprites.add(self.bb)
         self.all_sprites.add(self.bb)
@@ -113,6 +157,9 @@ class MainGame:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         game_over = False
+                        self.start_game()
+                    if event.key == pygame.K_BACKSPACE:
+                        self.terminate()
             self.show_message('ИГРА ОКОНЧЕНА', self.screen_size[0] / 2 - 225,
                               self.screen_size[1] / 2 - 100,
                               (201, 0, 0),
@@ -130,7 +177,10 @@ class MainGame:
 
     def start(self):
         while True:
-            self.screen.fill((255, 255, 255))
+            if self.score // 50 % 2 == 1 and self.score != 0:
+                self.screen.fill((0, 0, 0))
+            else:
+                self.screen.fill((255, 255, 255))
             self.get_events()
             self.update_all()
             self.show_message('Счет: ' + str(self.score), 30, 30, (0, 0, 0), 30)

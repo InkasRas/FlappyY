@@ -10,8 +10,8 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
-    def update(self, score):
-        self.rect.x -= 4 + score // 10
+    def update(self, score, speed=None):
+        self.rect.x -= 4 + score // 10 if speed is None else speed
         self.mask = pygame.mask.from_surface(self.image)
 
 
@@ -33,9 +33,37 @@ class Circle:
         self.y = randint(10, 640)
         self.size = randint(50, 90)
 
-    def update(self, score):
-        self.x -= 4 + score // 10
+    def update(self, score, speed=None):
+        self.x -= 4 + score // 10 if speed is None else speed
         self.size -= 1
         if self.size < 0:
             self.size = 0
         pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.size)
+
+
+class Abilities(pygame.sprite.Sprite):
+    def __init__(self, x, y, file_name):
+        super().__init__()
+        self.image = pygame.image.load(file_name)
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = x, y
+
+    def update(self, score, speed=None):
+        self.rect.x -= 4 + score // 10 if speed is None else speed
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Ghost(Abilities):
+    def __init__(self, x, y):
+        super().__init__(x, y, 'Extra Files/ghost.png')
+
+
+class ExtraSpeed(Abilities):
+    def __init__(self, x, y):
+        super().__init__(x, y, 'Extra Files/speed.png')
+
+
+class FixWidth(Abilities):
+    def __init__(self, x, y):
+        super().__init__(x, y, 'Extra Files/fixwidth.png')

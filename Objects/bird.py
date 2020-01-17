@@ -11,8 +11,8 @@ class Bird(pygame.sprite.Sprite):
         self.x = x
         self.y = y
 
-    def update(self, score):
-        self.y += 3 + score // 20 * 0.4
+    def update(self, score, speed=None):
+        self.y += 3 + score // 20 * 0.4 if speed is None else 3.5
         if 30 < self.y < 630:
             self.rect.center = (self.x, self.y)
         self.mask = pygame.mask.from_surface(self.image)
